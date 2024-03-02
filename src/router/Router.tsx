@@ -1,12 +1,12 @@
-import * as React from "react";
 import { Routes, Route } from 'react-router-dom';
+import App from "../App";
 
-function Router() {
+function Routing() {
   return (
     <Routes>
-      <Route path="/" element={null} />
+      <Route path="/" element={<App />} />
     </Routes>
   )
 }
 
-export default Router;
+export default Routing;

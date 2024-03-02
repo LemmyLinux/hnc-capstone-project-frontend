@@ -1,11 +1,14 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
-import Router from './router/Router';
+import Calendar from './components/Calendar';
+
 
 function App() {
+
   return (
-    <Router />
+    <section className="App">
+        <Calendar />
+    </section>
   );
 }
 
