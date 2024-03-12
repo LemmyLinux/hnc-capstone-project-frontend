@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import Calendar from './components/Calendar';
-
+import Calendar from './components/calendar/Calendar';
+import SidePanel from './components/sidePanel/SidePanel';
 
 function App() {
 
   return (
-    <section className="App">
+    <section className="app">
         <Calendar />
+        <SidePanel />
     </section>
   );
 }

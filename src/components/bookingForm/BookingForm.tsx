@@ -32,16 +32,16 @@ function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) 
                     <label htmlFor='subject'>Asignatura</label>
                     <input id='subject' type='string' value={lessonSubject} onChange={function(event){setLessonSubject(event.target.value)}}/>
                     
-                    <label htmlFor={'comment1'}>Comentario</label>
+                    <label htmlFor={'comment1'}>Comentario 1</label>
                     <input id={'comment1'} type='string' value={lessonComment1} onChange={function(event){setLessonComment1(event.target.value)}}/>
-                    <label htmlFor={'comment2'}>Comentario</label>
+                    <label htmlFor={'comment2'}>Comentario 2</label>
                     <input id={'comment2'} type='string' value={lessonComment2} onChange={function(event){setLessonComment2(event.target.value)}}/>
-                    <label htmlFor={'comment3'}>Comentario</label>
+                    <label htmlFor={'comment3'}>Comentario 3</label>
                     <input id={'comment3'} type='string' value={lessonComment3} onChange={function(event){setLessonComment3(event.target.value)}}/>
 
                     <div className='field-container'>
-                        <span className='column'><button style={{width: '100%'}} onClick={function(){toggleShow()}}>Aceptar</button></span>
-                        <span className='column'><button style={{width: '100%'}} onClick={function(){toggleShow()}}>Cancelar</button></span>
+                        <span className='column'><button style={{width: '100%', height: '100%'}} onClick={function(){toggleShow()}}>Aceptar</button></span>
+                        <span className='column'><button style={{width: '100%', height: '100%'}} onClick={function(){toggleShow()}}>Cancelar</button></span>
                     </div>
                 </form>
             </section>

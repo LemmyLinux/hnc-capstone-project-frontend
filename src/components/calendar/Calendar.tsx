@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './Calendar.css';
 import { MONTH_NAMES, WEEK_LENGTH, getNextDate, getPreviousDate } from '../../common/dates';
 import BookingForm from '../bookingForm/BookingForm';
+import { apiFetch } from '../../common/fetch';
 
 interface Day {
     date: Date;
@@ -53,7 +54,10 @@ function Calendar() {
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [show, setShow] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const toggleShow = function(){setShow(!show)};
+
+
     function getPreviousMonth() {
         let month = currentDate.getMonth() - 1;
         if (month < 0) month = 11;
@@ -76,6 +80,11 @@ function Calendar() {
 
     useEffect(() => {
         const dates = generateMonthDates(currentDate.getFullYear(), currentDate.getMonth());
+        setIsLoading(true);
+        const bookings = apiFetch('/bookings');
+        setIsLoading(false);
+
+        console.log('bookings', bookings);
         setDates(dates);
     }, [currentDate]);
 
@@ -86,14 +95,14 @@ function Calendar() {
                 <h2 style={{ minWidth: '43.5%' }}>{MONTH_NAMES[currentDate.getMonth()] + ' ' + currentDate.getFullYear()}</h2>
                 <button onClick={getNextMonth}>NEXT</button>
             </div>
-            <div className='week'>
-                <div className='header'>Lunes</div>
-                <div className='header'>Martes</div>
-                <div className='header'>Mi&eacute;rcoles</div>
-                <div className='header'>Jueves</div>
-                <div className='header'>Viernes</div>
-                <div className='header'>S&aacute;bado</div>
-                <div className='header'>Domingo</div>
+            <div className='week header'>
+                <div>Lunes</div>
+                <div>Martes</div>
+                <div>Mi&eacute;rcoles</div>
+                <div>Jueves</div>
+                <div>Viernes</div>
+                <div>S&aacute;bado</div>
+                <div>Domingo</div>
             </div>
             <div className='week'>
             </div>
