@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import './Calendar.css';
-import { MONTH_NAMES, WEEK_LENGTH, getNextDate, getPreviousDate } from '../../common/dates';
+import { MONTH_NAMES, WEEK_LENGTH, areEqual, getNextDate, getPreviousDate } from '../../common/dates';
 import BookingForm from '../bookingForm/BookingForm';
 import { apiFetch } from '../../common/fetch';
+import Booking from '../../model/Booking';
+import BookingTag from '../bookingTag/BookingTag';
 
 interface Day {
     date: Date;
@@ -48,14 +50,14 @@ function generateMonthDates(year: number, month: number) {
     return monthDates;
 }
 
-
 function Calendar() {
     const [dates, setDates] = useState<Day[][]>([]);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [show, setShow] = useState(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const toggleShow = function(){setShow(!show)};
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [bookings, setBookings] = useState<Booking[]>([]);
 
 
     function getPreviousMonth() {
@@ -71,20 +73,22 @@ function Calendar() {
     function getNextMonth() {
         let month = currentDate.getMonth() + 1;
         if (month === 12) month = 0;
-
+        
         let year = currentDate.getFullYear();
         if (month === 0) year = year + 1;
 
         setCurrentDate(new Date(year, month, 1));
     }
 
-    useEffect(() => {
+    useEffect(function() {
+
         const dates = generateMonthDates(currentDate.getFullYear(), currentDate.getMonth());
         setIsLoading(true);
-        const bookings = apiFetch('/bookings');
         setIsLoading(false);
-
-        console.log('bookings', bookings);
+        apiFetch('/bookings')
+        .then(function(bookings){
+            setBookings(bookings);
+        })
         setDates(dates);
     }, [currentDate]);
 
@@ -95,14 +99,14 @@ function Calendar() {
                 <h2 style={{ minWidth: '43.5%' }}>{MONTH_NAMES[currentDate.getMonth()] + ' ' + currentDate.getFullYear()}</h2>
                 <button onClick={getNextMonth}>NEXT</button>
             </div>
-            <div className='week header'>
-                <div>Lunes</div>
-                <div>Martes</div>
-                <div>Mi&eacute;rcoles</div>
-                <div>Jueves</div>
-                <div>Viernes</div>
-                <div>S&aacute;bado</div>
-                <div>Domingo</div>
+            <div className='week'>
+                <div className='header'>Lunes</div>
+                <div className='header'>Martes</div>
+                <div className='header'>Mi&eacute;rcoles</div>
+                <div className='header'>Jueves</div>
+                <div className='header'>Viernes</div>
+                <div className='header'>S&aacute;bado</div>
+                <div className='header'>Domingo</div>
             </div>
             <div className='week'>
             </div>
@@ -125,6 +129,11 @@ function Calendar() {
                                             }
                                         }>
                                             <span className='day-label'>{cell.date.getDate()}</span>
+                                            {bookings && 
+                                                bookings
+                                                .filter(function(booking){return areEqual(new Date(booking.start), cell.date)})
+                                                .map(function(booking){ return <BookingTag booking={booking as Booking} />})
+                                                }
                                         </div>
                                     )
                                 }

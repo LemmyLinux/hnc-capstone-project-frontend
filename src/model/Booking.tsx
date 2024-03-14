@@ -2,7 +2,7 @@ import BookingStatus from "./BookingStatus";
 import Lesson from "./Lesson";
 
 type Booking = {
-    id: number;
+    id?: number;
     date: Date;
     start: Date;
     end: Date;

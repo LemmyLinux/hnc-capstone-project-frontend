@@ -20,18 +20,23 @@
 .day {
   width: 13%;
   min-height: 200px;
+  max-height: 200px;
   border: solid 1px;
   display: flex;
+  flex-direction: column;
   margin-bottom: 1%;
+  overflow-y: scroll;
 }
 .day-label {
   font-size: 1.5em;
   font-weight: 600;
-  padding: 1%;
-  width: 100%;
+  width: 99%;
   height: 15%;
+  min-height: 15%;
   background-color: lightblue;
   border-bottom: solid 1px;
+  padding-left: 1%;
+  overflow-y: scroll;
 }
 .disabled {
   background-color: lightgray;

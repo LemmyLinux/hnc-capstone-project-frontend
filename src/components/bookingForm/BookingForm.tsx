@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 import { getFormatedDate } from '../../common/dates';
 import './BookingForm.css';
 import Booking from '../../model/Booking';
+import BookingStatus from '../../model/BookingStatus';
+import { apiFetch } from '../../common/fetch';
 
 interface BookingFormProps {
     date: Date;
@@ -18,13 +20,48 @@ function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) 
     const [lessonComment2, setLessonComment2] = useState<string>('');
     const [lessonComment3, setLessonComment3] = useState<string>('');
 
+
+    function validateStart() {
+        return new Date() < new Date(start);
+    }
+
+    function validateEnd() {
+        return new Date() < new Date(end) && new Date(start) < new Date(end);
+    }
+
+    function validateSubject() {
+        return lessonSubject && lessonSubject.length > 0;
+    }
+
+    function createBooking(event: FormEvent) {
+        event.preventDefault();
+        const booking = {
+            id: 0,
+            date: new Date(),
+            start: new Date(date.toDateString() + ' ' + start),
+            end: new Date(date.toDateString() + ' ' + end),
+            status: BookingStatus.BOOKED,
+            lesson: {
+                id: 0,
+                subject: lessonSubject,
+                comments: [lessonComment1, lessonComment2, lessonComment3]
+            }
+        }
+        console.log(booking);
+        apiFetch('/booking', 'POST', booking)
+        .then(response => console.log(response))
+        .catch(error => console.log('error:', error));
+    }
+
+    
+
     return (
         <section className='modal' hidden={!show}>
             <section className='modal-main'>
                 <button className='close-button' onClick={function(){toggleShow()}}>X</button>
                 <h2>Nueva reserva</h2>
                 <span>{getFormatedDate(date)}</span>
-                <form className='modal-form'>
+                <form className='modal-form' onSubmit={createBooking}>
                     <label htmlFor='start' className='label'>Hora inicio</label>
                     <input id='start' type='time' value={start} onChange={function(event){setStart(event.target.value)}}/>
                     <label htmlFor='end'>Hora fin</label>

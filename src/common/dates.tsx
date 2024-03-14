@@ -37,3 +37,13 @@ export function getPreviousDate(date: Date, numberOfDays: number) {
 export function getFormatedDate(date: Date) {
     return WEEKDAY_NAMES[date.getDay()] + ', ' + date.getDate() + ' de ' + MONTH_NAMES[date.getMonth()] + ' de ' + date.getFullYear();
 }
+
+export function getFormmatedTime(date: Date) {
+    return date.toTimeString().substring(0, 8);
+}
+
+export function areEqual(date1: Date, date2: Date) {
+    return date1.getFullYear() === date2.getFullYear()
+        && date1.getMonth() === date2.getMonth()
+        && date1.getDate() === date2.getDate();
+}
