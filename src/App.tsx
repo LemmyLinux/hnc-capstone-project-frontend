@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import Calendar from './components/calendar/Calendar';
-import SidePanel from './components/sidePanel/SidePanel';
+import React from 'react';
+import ClientRoutes from './router/ClientRoutes';
+import { BrowserRouter, Router, Routes } from 'react-router-dom';
 
 function App() {
 
   return (
-    <section className="app">
-        <Calendar />
-        <SidePanel />
+    <section>
+      <BrowserRouter>
+          <ClientRoutes />
+       </BrowserRouter>
     </section>
   );
 }

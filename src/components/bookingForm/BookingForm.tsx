@@ -7,12 +7,11 @@ import { apiFetch } from '../../common/fetch';
 
 interface BookingFormProps {
     date: Date;
-    show: boolean;
     toggleShow: Function;
     bookingProp?: Booking;
 }
 
-function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) {
+function BookingForm({ date, toggleShow, bookingProp }: BookingFormProps) {
     const [start, setStart] = useState<string>('');
     const [end, setEnd] = useState<string>('');
     const [lessonSubject, setLessonSubject] = useState<string>('');
@@ -20,6 +19,23 @@ function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) 
     const [lessonComment2, setLessonComment2] = useState<string>('');
     const [lessonComment3, setLessonComment3] = useState<string>('');
 
+    if(bookingProp) {
+        console.log(bookingProp);
+        const bookingStart = new Date(bookingProp.start);
+        const bookingEnd = new Date(bookingProp.end);
+        setStart(bookingStart.getHours() + ':' + bookingStart.getMinutes());
+        setEnd(bookingEnd.getHours() + ':' + bookingEnd.getMinutes());
+        setLessonSubject(bookingProp.lesson.subject);
+        if(bookingProp.lesson.comments) {
+            setLessonComment1(bookingProp.lesson.comments[0]);
+            setLessonComment2(bookingProp.lesson.comments[1]);
+            setLessonComment3(bookingProp.lesson.comments[2]);
+        }
+        console.log(start);
+        console.log(end);
+        console.log(lessonSubject);
+    }
+    
 
     function validateStart() {
         return new Date() < new Date(start);
@@ -35,6 +51,7 @@ function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) 
 
     function createBooking(event: FormEvent) {
         event.preventDefault();
+        // console.log('fddfgdfgdfgdfg');
         const booking = {
             id: 0,
             date: new Date(),
@@ -48,15 +65,18 @@ function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) 
             }
         }
         console.log(booking);
+        // console.log('start', start);
         apiFetch('/booking', 'POST', booking)
         .then(response => console.log(response))
         .catch(error => console.log('error:', error));
+
+        toggleShow();
     }
 
     
 
     return (
-        <section className='modal' hidden={!show}>
+        <section className='modal'>
             <section className='modal-main'>
                 <button className='close-button' onClick={function(){toggleShow()}}>X</button>
                 <h2>Nueva reserva</h2>
@@ -77,7 +97,8 @@ function BookingForm({ date, show, toggleShow, bookingProp }: BookingFormProps) 
                     <input id={'comment3'} type='string' value={lessonComment3} onChange={function(event){setLessonComment3(event.target.value)}}/>
 
                     <div className='field-container'>
-                        <span className='column'><button style={{width: '100%', height: '100%'}} onClick={function(){toggleShow()}}>Aceptar</button></span>
+                        {/* <span className='column'><button style={{width: '100%', height: '100%'}} onClick={function(){toggleShow()}}>Aceptar</button></span> */}
+                        <span className='column'><button style={{width: '100%', height: '100%'}}>Aceptar</button></span>
                         <span className='column'><button style={{width: '100%', height: '100%'}} onClick={function(){toggleShow()}}>Cancelar</button></span>
                     </div>
                 </form>

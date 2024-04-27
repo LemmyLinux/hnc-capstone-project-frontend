@@ -1,22 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import Booking from "../../model/Booking";
 import "./BookingTag.css";
 import { getFormmatedTime } from "../../common/dates";
 
 interface BookingTagProps {
     booking: Booking;
-    showForm?: Function;
+    onClick: Function;
 }
 
 function getBookingInfo(booking: Booking){
     return getFormmatedTime(new Date(booking.start)) + " - " + getFormmatedTime(new Date(booking.end));
 }
 
-function BookingTag({booking, showForm}: BookingTagProps) {
+function BookingTag({booking, onClick}: BookingTagProps) {
 
     return (
-        // <div key={booking.id} className="tag" onClick={function(){showForm()}}>
-            <div key={booking.id} className="tag">
+        <div key={booking.id} className="tag" onClick={function(){onClick()}}>
             <span>{getBookingInfo(booking)}</span>
         </div>
     )

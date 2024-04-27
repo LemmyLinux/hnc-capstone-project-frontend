@@ -58,6 +58,7 @@ function Calendar() {
     const toggleShow = function(){setShow(!show)};
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [currentBooking, setCurrentBooking] = useState<Booking | undefined>(undefined);
 
 
     function getPreviousMonth() {
@@ -78,6 +79,16 @@ function Calendar() {
         if (month === 0) year = year + 1;
 
         setCurrentDate(new Date(year, month, 1));
+    }
+
+    function placeBookings(date: Date){
+        return bookings
+        .filter(function(booking){return areEqual(new Date(booking.start), date)})
+        .map(function(booking){ return <BookingTag booking={booking as Booking} onClick={function(){
+            setSelectedDate(date);
+            setCurrentBooking(booking);
+            toggleShow();
+        }}/>})
     }
 
     useEffect(function() {
@@ -129,11 +140,7 @@ function Calendar() {
                                             }
                                         }>
                                             <span className='day-label'>{cell.date.getDate()}</span>
-                                            {bookings && 
-                                                bookings
-                                                .filter(function(booking){return areEqual(new Date(booking.start), cell.date)})
-                                                .map(function(booking){ return <BookingTag booking={booking as Booking} />})
-                                                }
+                                            {bookings && placeBookings(cell.date)}
                                         </div>
                                     )
                                 }
@@ -143,7 +150,7 @@ function Calendar() {
                     }
                 )
             }
-            <BookingForm date={selectedDate} show={show} toggleShow={toggleShow} />
+            {show && <BookingForm date={selectedDate} toggleShow={toggleShow} bookingProp={currentBooking}/>}
         </section>
     );
 }
