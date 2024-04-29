@@ -8,7 +8,8 @@ function SidePanel() {
     return (
         <section className='side-panel'>
             <h2>TODO...</h2>
-            <h2>FDASÑGLHDÑAHGFSGDFGSDFGSDFGSDFGDSFGDFGSDGSDFGSDFGFGHDJHGHJGFGHFGJHSGFHSVBDFGDFHGSFGHSFGHVBFGHSFHFGHSDFHGFGHFGH</h2>
+            <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc non blandit sapien. Pellentesque malesuada dui erat, rutrum sagittis ligula rhoncus ac.
+</h2>
         </section>
     );
 }

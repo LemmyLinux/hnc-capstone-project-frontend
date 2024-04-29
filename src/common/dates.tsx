@@ -59,7 +59,7 @@ export function getFormatedDate(date: Date) {
  * @returns string formateado
  */
 export function getFormmatedTime(date: Date) {
-    return date.toTimeString().substring(0, 8);
+    return date.toLocaleString('en', {timeZone: 'Europe/Madrid'}).substring(10, 15);
 }
 
 /**

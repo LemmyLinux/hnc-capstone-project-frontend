@@ -15,7 +15,7 @@ function getBookingInfo(booking: Booking){
 function BookingTag({booking, onClick}: BookingTagProps) {
 
     return (
-        <div key={booking.id} className="tag" onClick={function(){onClick()}}>
+        <div key={booking.id} className="tag" onClick={function(event) {event.stopPropagation(); onClick()}}>
             <span>{getBookingInfo(booking)}</span>
         </div>
     )

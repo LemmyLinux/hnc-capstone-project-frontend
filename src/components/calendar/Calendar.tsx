@@ -5,6 +5,7 @@ import BookingForm from '../bookingForm/BookingForm';
 import { apiFetch } from '../../common/fetch';
 import Booking from '../../model/Booking';
 import BookingTag from '../bookingTag/BookingTag';
+import { useNavigate } from 'react-router-dom';
 
 interface Day {
     date: Date;
@@ -46,20 +47,15 @@ function generateMonthDates(year: number, month: number) {
             currentDay = getNextDate(currentDay);
         }
     }
-
     return monthDates;
 }
 
 function Calendar() {
+    const navigate = useNavigate();
     const [dates, setDates] = useState<Day[][]>([]);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-    const [show, setShow] = useState(false);
-    const toggleShow = function(){setShow(!show)};
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    // const [isLoading, setIsLoading] = useState<boolean>(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
-    const [currentBooking, setCurrentBooking] = useState<Booking | undefined>(undefined);
-
 
     function getPreviousMonth() {
         let month = currentDate.getMonth() - 1;
@@ -84,18 +80,18 @@ function Calendar() {
     function placeBookings(date: Date){
         return bookings
         .filter(function(booking){return areEqual(new Date(booking.start), date)})
-        .map(function(booking){ return <BookingTag booking={booking as Booking} onClick={function(){
-            setSelectedDate(date);
-            setCurrentBooking(booking);
-            toggleShow();
+        .map(function(booking){ 
+            console.log('retrieved: ', booking);
+            return <BookingTag booking={booking as Booking} onClick={function(){
+            
+            navigate('/booking', {state: {'booking': booking, 'date': date}});
         }}/>})
     }
 
     useEffect(function() {
-
         const dates = generateMonthDates(currentDate.getFullYear(), currentDate.getMonth());
-        setIsLoading(true);
-        setIsLoading(false);
+        // setIsLoading(true);
+        // setIsLoading(false);
         apiFetch('/bookings')
         .then(function(bookings){
             setBookings(bookings);
@@ -134,8 +130,7 @@ function Calendar() {
                                         <div key={rowIndex + '-' + columnIndex} className={classes} onClick={
                                             function () { 
                                                 if(!cell.disabled){
-                                                    setSelectedDate(cell.date);
-                                                    setShow(true);
+                                                    navigate('/booking', {state: {'date': cell.date, 'booking': false}});
                                                 }
                                             }
                                         }>
@@ -150,7 +145,6 @@ function Calendar() {
                     }
                 )
             }
-            {show && <BookingForm date={selectedDate} toggleShow={toggleShow} bookingProp={currentBooking}/>}
         </section>
     );
 }
