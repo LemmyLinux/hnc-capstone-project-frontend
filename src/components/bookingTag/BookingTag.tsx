@@ -16,6 +16,7 @@ function BookingTag({booking, onClick}: BookingTagProps) {
 
     return (
         <div key={booking.id} className="tag" onClick={function(event) {event.stopPropagation(); onClick()}}>
+            <span>{booking.lesson.subject.substring(0, 14)}</span>
             <span>{getBookingInfo(booking)}</span>
         </div>
     )

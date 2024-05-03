@@ -81,7 +81,6 @@ function Calendar() {
         return bookings
         .filter(function(booking){return areEqual(new Date(booking.start), date)})
         .map(function(booking){ 
-            console.log('retrieved: ', booking);
             return <BookingTag booking={booking as Booking} onClick={function(){
             
             navigate('/booking', {state: {'booking': booking, 'date': date}});
