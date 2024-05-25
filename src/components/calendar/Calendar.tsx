@@ -1,18 +1,25 @@
 import { useEffect, useState } from 'react';
 import './Calendar.css';
-import { MONTH_NAMES, WEEK_LENGTH, areEqual, getNextDate, getPreviousDate } from '../../common/dates';
-import BookingForm from '../bookingForm/BookingForm';
+import { MONTH_NAMES, WEEKDAY_NAMES, WEEK_LENGTH, areEqual, getNextDate, getPreviousDate } from '../../common/dates';
 import { apiFetch } from '../../common/fetch';
 import Booking from '../../model/Booking';
 import BookingTag from '../bookingTag/BookingTag';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeftSquareFill, ArrowRightSquareFill } from 'react-bootstrap-icons';
+import WaitModal from '../waitModal/WaitModal';
+
+interface CalendarProps {
+    currentDate: Date;
+    lessonFilter: string;
+    setCurrentDate: Function;
+}
 
 interface Day {
     date: Date;
-    disabled?: boolean;
+    disabled: boolean;
 }
 
-function generateMonthDates(year: number, month: number) {
+const generateMonthDates = (year: number, month: number) => {
     const monthDates: Day[][] = [];
     const lastDisabledDay = getPreviousDate(new Date(), 1);
     let currentDay = new Date(year, month, 1);
@@ -50,101 +57,109 @@ function generateMonthDates(year: number, month: number) {
     return monthDates;
 }
 
-function Calendar() {
+const Calendar = (props: CalendarProps) => {
     const navigate = useNavigate();
     const [dates, setDates] = useState<Day[][]>([]);
-    const [currentDate, setCurrentDate] = useState<Date>(new Date());
-    // const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
 
-    function getPreviousMonth() {
-        let month = currentDate.getMonth() - 1;
+    const getPreviousMonth = () => {
+        let month = props.currentDate.getMonth() - 1;
         if (month < 0) month = 11;
 
-        let year = currentDate.getFullYear();
+        let year = props.currentDate.getFullYear();
         if (month === 11) year = year - 1;
 
-        setCurrentDate(new Date(year, month, 1));
+        props.setCurrentDate(new Date(year, month, 1));
     }
 
-    function getNextMonth() {
-        let month = currentDate.getMonth() + 1;
+    const getNextMonth = () => {
+        let month = props.currentDate.getMonth() + 1;
         if (month === 12) month = 0;
         
-        let year = currentDate.getFullYear();
+        let year = props.currentDate.getFullYear();
         if (month === 0) year = year + 1;
 
-        setCurrentDate(new Date(year, month, 1));
+        props.setCurrentDate(new Date(year, month, 1));
     }
 
-    function placeBookings(date: Date){
+    const placeBookings = (date: Date, disabled: boolean) => {
         return bookings
-        .filter(function(booking){return areEqual(new Date(booking.start), date)})
-        .map(function(booking){ 
-            return <BookingTag booking={booking as Booking} onClick={function(){
-            
-            navigate('/booking', {state: {'booking': booking, 'date': date}});
+        .filter((booking) => {return areEqual(new Date(booking.start), date)})
+        .filter((booking) => {return !props.lessonFilter || props.lessonFilter === booking.lesson.subject})
+        .map((booking) => { 
+            return <BookingTag booking={booking as Booking} disabled={disabled} onClick={() => {
+            navigate('/booking', {state: {'booking': booking, 'date': date, disabled: disabled}});
         }}/>})
     }
 
-    useEffect(function() {
-        const dates = generateMonthDates(currentDate.getFullYear(), currentDate.getMonth());
-        // setIsLoading(true);
-        // setIsLoading(false);
-        apiFetch('/bookings')
-        .then(function(bookings){
-            setBookings(bookings);
-        })
+    const updateCalendar = async() => {
+        setIsLoading(true);
+        const dates = generateMonthDates(props.currentDate.getFullYear(), props.currentDate.getMonth());
+        const bookings = await apiFetch('/bookings');
         setDates(dates);
-    }, [currentDate]);
+        setBookings(bookings);
+        setIsLoading(false);
+    }
+
+    useEffect(() =>  {
+        updateCalendar();
+    }, []);
+
+    useEffect(() => {
+        updateCalendar();
+    }, [props.currentDate]);
 
     return (
-        <section className="calendar">
-            <div className='header'>
-                <button onClick={getPreviousMonth}>PREV</button>
-                <h2 style={{ minWidth: '43.5%' }}>{MONTH_NAMES[currentDate.getMonth()] + ' ' + currentDate.getFullYear()}</h2>
-                <button onClick={getNextMonth}>NEXT</button>
-            </div>
-            <div className='week'>
-                <div className='header'>Lunes</div>
-                <div className='header'>Martes</div>
-                <div className='header'>Mi&eacute;rcoles</div>
-                <div className='header'>Jueves</div>
-                <div className='header'>Viernes</div>
-                <div className='header'>S&aacute;bado</div>
-                <div className='header'>Domingo</div>
-            </div>
-            <div className='week'>
-            </div>
-            {
-                dates && dates.map(
-                    function (row, rowIndex) {
-                        return <div key={rowIndex} className='week'>
-                            {
-                                row && row.map(function (cell, columnIndex) {
-                                    let classes = 'day';
-                                    if (rowIndex === 0) classes += ' first-week';
-                                    if (cell.disabled) classes += ' disabled';
-                                    return (
-                                        <div key={rowIndex + '-' + columnIndex} className={classes} onClick={
-                                            function () { 
-                                                if(!cell.disabled){
-                                                    navigate('/booking', {state: {'date': cell.date, 'booking': false}});
-                                                }
-                                            }
-                                        }>
-                                            <span className='day-label'>{cell.date.getDate()}</span>
-                                            {bookings && placeBookings(cell.date)}
-                                        </div>
-                                    )
-                                }
-                                )
-                            }
+        <>
+            {isLoading && <WaitModal />}
+            {!isLoading &&
+                (
+                    <section className='calendar bg-light'>
+                        <div className='header'>
+                            <span onClick={getPreviousMonth}><ArrowLeftSquareFill className='text-info' /></span>
+                            <h2 style={{ minWidth: '43.5%' }}>{MONTH_NAMES[props.currentDate.getMonth()] + ' ' + props.currentDate.getFullYear()}</h2>
+                            <span onClick={getNextMonth}><ArrowRightSquareFill className='text-info' /></span>
                         </div>
-                    }
+                        <div className='week'>
+                            {WEEKDAY_NAMES.map((dayName: string) => {
+                                return (<div className='header'>{dayName}</div>);
+                            })}
+                        </div>
+                        <div className='week'>
+                        </div>
+                        {
+                            dates && dates.map(
+                                (row, rowIndex) => {
+                                    return <div key={rowIndex} className='week'>
+                                        {
+                                            row && row.map((cell, columnIndex) => {
+                                                let classes = 'day';
+                                                if (rowIndex === 0) classes += ' first-week';
+                                                if (cell.disabled) classes += ' bg-secondary';
+                                                return (
+                                                    <div key={rowIndex + '-' + columnIndex} className={classes} onClick={
+                                                        () => { 
+                                                            if(!cell.disabled){
+                                                                navigate('/booking', {state: {'date': cell.date, 'booking': false}});
+                                                            }
+                                                        }
+                                                    }>
+                                                        <span className='day-label bg-info'>{cell.date.getDate()}</span>
+                                                        {bookings && placeBookings(cell.date, cell.disabled)}
+                                                    </div>
+                                                )
+                                            }
+                                            )
+                                        }
+                                    </div>
+                                }
+                            )
+                        }
+                    </section>
                 )
             }
-        </section>
+        </>
     );
 }
 

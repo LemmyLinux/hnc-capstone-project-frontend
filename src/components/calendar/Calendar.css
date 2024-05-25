@@ -19,8 +19,8 @@
 }
 .day {
   width: 13%;
-  min-height: 200px;
-  max-height: 200px;
+  min-height: 150px;
+  max-height: 150px;
   border: solid 1px;
   display: flex;
   flex-direction: column;
@@ -28,16 +28,13 @@
   overflow-y: scroll;
 }
 .day-label {
-  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
   font-weight: 600;
-  width: 99%;
   height: 15%;
   min-height: 15%;
-  background-color: lightblue;
   border-bottom: solid 1px;
   padding-left: 1%;
   overflow-y: scroll;
-}
-.disabled {
-  background-color: lightgray;
 }
