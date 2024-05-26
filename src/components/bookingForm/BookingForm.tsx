@@ -80,7 +80,6 @@ const BookingForm = () => {
             setShowModal(true);
         })
         .catch((error) => {
-            console.log('err0r', error);
             setModalData({
                 title: 'Error',
                 message: 'Ocurrió un error al guardar los datos de la reserva: ' + error.message,
@@ -166,33 +165,60 @@ const BookingForm = () => {
                     <div className='row  p-2'>
                         <div className='form-group col p-2'>
                             <label htmlFor='start'>Hora inicio</label>
-                            <input id='start' type='time' className='form-control' value={start}  onChange={(event) => {setStart(event.target.value)}} disabled={disabled}/>
+                            <input id='start' type='time' className='form-control' 
+                                required value={start}  
+                                onChange={(event) => {setStart(event.target.value)}} disabled={disabled}
+                            />
                         </div>
                         <div className='form-group col p-2'>
                             <label htmlFor='end'>Hora fin</label>
-                            <input id='end' type='time'  className='form-control' value={end}  onChange={(event) => {setEnd(event.target.value)}} disabled={disabled}/>
+                            <input id='end' type='time'  className='form-control' 
+                                required value={end}  
+                                onChange={(event) => {setEnd(event.target.value)}} disabled={disabled}
+                            />
                         </div>
                     </div>
                     
                     <div className='row  p-2'>
                         <div className='form-group col p-2'>
                             <label htmlFor='subject'>Asignatura</label>
-                            <input id='subject' type='string'  className='form-control' value={lessonSubject}  onChange={(event) => {setLessonSubject(event.target.value)}} disabled={disabled}/>
+                            <input id='subject' type='string' 
+                                className='form-control' required value={lessonSubject}  
+                                onChange={(event) => {setLessonSubject(event.target.value)}} disabled={disabled}
+                            />
                         </div>
                     </div>
                     <div className='row  p-2'>
                         <div className='form-group col p-2'>
                             <label htmlFor={'comment1'}>Comentario 1</label>
-                            <textarea id={'comment1'}  className='form-control' value={lessonComment1} onChange={(event) => {setLessonComment1(event.target.value)}} disabled={disabled}></textarea>
+                            <textarea id={'comment1'}  className='form-control' 
+                                value={lessonComment1} onChange={(event) => {setLessonComment1(event.target.value)}} 
+                                disabled={disabled}>
+                            </textarea>
                             <label htmlFor={'comment2'}>Comentario 2</label>
-                            <textarea id={'comment2'}  className='form-control' value={lessonComment2} onChange={(event) => {setLessonComment2(event.target.value)}} disabled={disabled}></textarea>
+                            <textarea id={'comment2'}  className='form-control' 
+                                value={lessonComment2} onChange={(event) => {setLessonComment2(event.target.value)}} 
+                                disabled={disabled}>
+                            </textarea>
                             <label htmlFor={'comment3'}>Comentario 3</label>
-                            <textarea id={'comment3'}  className='form-control' value={lessonComment3} onChange={(event) => {setLessonComment3(event.target.value)}} disabled={disabled}></textarea>
+                            <textarea id={'comment3'}  className='form-control' 
+                                value={lessonComment3} onChange={(event) => {setLessonComment3(event.target.value)}} 
+                                disabled={disabled}>
+                            </textarea>
                         </div>
                     </div>
-                        <div className='form-group row p-3'><button className='btn btn-success' disabled={disabled}>Aceptar</button></div>
-                        <div className='form-group row p-3'><button className='btn btn-primary' onClick={(event) => {cancel(event)}}>Volver</button></div>
-                            {!!id && <div className='form-group row p-3'><button className='btn btn-danger' onClick={(event) => {cancelBooking(event)}} disabled={disabled}>Anular reserva</button></div>}
+                        <div className='form-group row p-3'>
+                            <button className='btn btn-success' disabled={disabled}>Guardar</button>
+                        </div>
+                        <div className='form-group row p-3'>
+                            <button className='btn btn-primary' onClick={(event) => {cancel(event)}}>Volver</button>
+                        </div>
+                            {!!id && 
+                                <div className='form-group row p-3'>
+                                    <button className='btn btn-danger' onClick={(event) => {cancelBooking(event)}} 
+                                        disabled={disabled}>Anular reserva</button>
+                                </div>
+                            }
                 </form>
             </div>
         </section>

@@ -53,7 +53,9 @@ const SidePanel = (props: SidePanelProps) => {
                     <h2 className='text-center'>Filtros</h2>
                     <div className='container my-5'>
                     <p className='text-start'>Filtrar por asignatura:</p>
-                    <select className='form-select' aria-label='Default select example' onChange={(event) => {props.setLessonFilter(event.target.value)}}>
+                    <select className='form-select' aria-label='Default select example' 
+                        onChange={(event) => {props.setLessonFilter(event.target.value)}}
+                    >
                         <option selected value={EMPTY_FILTER}>Asignatura</option>
                         {lessons && lessons.map((lesson: string) => <option value={lesson}>{lesson}</option> )}
                     </select>
@@ -63,7 +65,9 @@ const SidePanel = (props: SidePanelProps) => {
                     <div className='row text-center px-5'>
                         <div className='col py-4'>
                             <label htmlFor='customRange1'>Año: {props.currentDate.getFullYear()}</label>
-                            <input type='range' className='custom-range' id='customRange1' min={minYear} max={maxYear} value={year} onChange={(event) => updateYear(parseInt(event.target.value))}/>
+                            <input type='range' className='custom-range' id='customRange1' 
+                                min={minYear} max={maxYear} value={year} onChange={(event) => updateYear(parseInt(event.target.value))}/
+                            >
                         </div>
                     </div>
                     <div className='row text-center'>
