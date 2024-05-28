@@ -25,7 +25,6 @@ export const WEEKDAY_NAMES = [
 
 const DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 export const WEEK_LENGTH = 7;
-export const TIME_VALIDATION_REGEX = /[0-2]\d:[0-5]\d/
 
 /**
  * Calcula el día siguiente a la fecha proporcionada por parámetro.

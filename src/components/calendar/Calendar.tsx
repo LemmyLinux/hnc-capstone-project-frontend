@@ -126,8 +126,6 @@ const Calendar = (props: CalendarProps) => {
                                 return (<div className='header'>{dayName}</div>);
                             })}
                         </div>
-                        <div className='week'>
-                        </div>
                         {
                             dates && dates.map(
                                 (row, rowIndex) => {
@@ -135,7 +133,6 @@ const Calendar = (props: CalendarProps) => {
                                         {
                                             row && row.map((cell, columnIndex) => {
                                                 let classes = 'day';
-                                                if (rowIndex === 0) classes += ' first-week';
                                                 if (cell.disabled) classes += ' bg-secondary';
                                                 return (
                                                     <div key={rowIndex + '-' + columnIndex} className={classes} onClick={

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { MONTH_NAMES } from '../../common/dates';
-import Lesson from '../../model/Lesson';
 import './SidePanel.css';
 import { Calendar3WeekFill } from 'react-bootstrap-icons';
 import WaitModal from '../waitModal/WaitModal';
