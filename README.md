@@ -9,7 +9,7 @@ The recomended software version for this project is:
 node 21.6.2
 npm 10.2.4
 
-To install de project just clone the repositiory and in the root folder you must run:
+To install the project just clone the repositiory and in the root folder you must run:
 
 ### `npm install`
 
