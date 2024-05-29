@@ -1,17 +1,20 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { getFormatedDate, getFormmatedTime } from '../../common/dates';
-import { BOOKED, CANCELLED } from '../../model/BookingStatus';
-import { POST, PUT, apiFetch } from '../../common/fetch';
+import { getFormatedDate, getFormmatedTime } from '../common/dates';
+import { BOOKED, CANCELLED } from '../model/BookingStatus';
+import { POST, PUT, apiFetch } from '../common/fetch';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Modal, { ModalProps, modalDefaultProps } from '../modal/Modal';
+import Modal, { ModalProps, modalDefaultProps } from './Modal';
 import { XSquareFill } from 'react-bootstrap-icons';
+import { HOME_ROUTE } from '../router/ClientRoutes';
+import Booking from '../model/Booking';
+import { LOGIN_STORAGE_KEY } from '../model/Login';
+import Header from './Header';
 
 const BookingForm = () => {
     const navigate = useNavigate();
     const state = useLocation().state;
     const date = state.date;
     const disabled = state.disabled;
-    // const [booking, setBooking] = useState<Booking>(state.booking);
     const [id, setId] = useState<number>(0);
     const [start, setStart] = useState<string>('');
     const [end, setEnd] = useState<string>('');
@@ -20,6 +23,7 @@ const BookingForm = () => {
     const [lessonComment1, setLessonComment1] = useState<string>('');
     const [lessonComment2, setLessonComment2] = useState<string>('');
     const [lessonComment3, setLessonComment3] = useState<string>('');
+    const [userMail, setUserMail] = useState<string>('');
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalData, setModalData] = useState<ModalProps>(modalDefaultProps);
 
@@ -36,6 +40,7 @@ const BookingForm = () => {
                 setLessonComment2(booking.lesson.comments[1]);
                 setLessonComment3(booking.lesson.comments[2]);
             }
+            setUserMail(booking.userMail);
         }
     }, []);
 
@@ -50,7 +55,8 @@ const BookingForm = () => {
                 id: lessonId,
                 subject: lessonSubject,
                 comments: [lessonComment1, lessonComment2, lessonComment3]
-            }
+            },
+            studentId: sessionStorage.getItem(LOGIN_STORAGE_KEY)
         };
         return booking;
     }
@@ -74,7 +80,7 @@ const BookingForm = () => {
                 title: 'Datos de la reserva guardados con éxito',
                 message: 'Los cambios se reflejarán en el calendario próximamente',
                 acceptLabel: 'Aceptar',
-                acceptAction: () => {navigate('/')},
+                acceptAction: () => {navigate(HOME_ROUTE)},
                 closeAction: () => {setShowModal(false)}
             });
             setShowModal(true);
@@ -101,7 +107,7 @@ const BookingForm = () => {
                 title: 'Reserva cancelada',
                 message: 'Los cambios se reflejarán en el calendario próximamente',
                 acceptLabel: 'Aceptar',
-                acceptAction: () => {navigate('/')},
+                acceptAction: () => {navigate(HOME_ROUTE)},
                 closeAction: () => {setShowModal(false)}
             });
             setShowModal(true);
@@ -128,7 +134,7 @@ const BookingForm = () => {
                 title: 'Reserva cancelada',
                 message: 'Los cambios se reflejarán en el calendario próximamente',
                 acceptLabel: 'Aceptar',
-                acceptAction: () => {navigate('/')},
+                acceptAction: () => {navigate(HOME_ROUTE)},
                 closeAction: () => {setShowModal(false)}
             });
             setShowModal(true);
@@ -147,16 +153,17 @@ const BookingForm = () => {
 
     const cancel = (event: any) => {
         event.preventDefault();
-        navigate('/');
+        navigate(HOME_ROUTE);
     }
 
     return (
         <>
+        <Header />
         <section className='container border p-2 d-flex my-5 bg-light'>
             <div className='container'>
                 <div className='row p-2' >
                     <h2 className='col'>Nueva reserva</h2>
-                    <span className='col text-end' onClick={() => {navigate('/')}}><XSquareFill className='text-danger' size={25}/></span>
+                    <span className='col text-end' onClick={() => {navigate(HOME_ROUTE)}}><XSquareFill className='text-danger' size={25}/></span>
                 </div>
                 <div className='row p-2'>
                     <span className='col'>{getFormatedDate(date)}</span>
@@ -187,6 +194,15 @@ const BookingForm = () => {
                                 onChange={(event) => {setLessonSubject(event.target.value)}} disabled={disabled}
                             />
                         </div>
+                        {userMail && 
+                            <div className='form-group col p-2'>
+                                <label htmlFor='mail'>Alumno</label>
+                                <input id='mail' type='mail' 
+                                    className='form-control' required value={lessonSubject}  
+                                    onChange={(event) => {setLessonSubject(event.target.value)}} disabled={disabled}
+                                />
+                            </div>
+                        }
                     </div>
                     <div className='row  p-2'>
                         <div className='form-group col p-2'>

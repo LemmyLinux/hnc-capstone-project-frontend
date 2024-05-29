@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { MONTH_NAMES } from '../../common/dates';
 import './SidePanel.css';
 import { Calendar3WeekFill } from 'react-bootstrap-icons';
-import WaitModal from '../waitModal/WaitModal';
+import WaitModal from '../WaitModal';
 import { apiFetch } from '../../common/fetch';
 import { EMPTY_FILTER } from '../../common/constants';
+import { useNavigate } from 'react-router-dom';
+import { LOGIN_ROUTE } from '../../router/ClientRoutes';
 
 interface SidePanelProps {
     lessonFilter: string;
@@ -14,6 +16,7 @@ interface SidePanelProps {
 }
 
 const SidePanel = (props: SidePanelProps) => {
+    const navigate = useNavigate();
     const [lessons, setLessons] = useState<string[]>();
     const [year, setYear] = useState<number>(props.currentDate.getFullYear());
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -36,6 +39,11 @@ const SidePanel = (props: SidePanelProps) => {
         const lessons = await apiFetch('/lessons');
         setLessons(lessons);
         setIsLoading(false);
+    }
+
+    const logout = () => {
+        sessionStorage.clear();
+        navigate(LOGIN_ROUTE);
     }
 
     useEffect(() => {
@@ -124,6 +132,11 @@ const SidePanel = (props: SidePanelProps) => {
                             <Calendar3WeekFill size={30}/>
                             <p>{MONTH_NAMES[11]}</p>
                         </div>
+                    </div>
+                </div>
+                <div className='row text-center'>
+                    <div className='col'>
+                        <button className='btn btn-danger w-75' onClick={logout}>Salir</button>
                     </div>
                 </div>
             </section>

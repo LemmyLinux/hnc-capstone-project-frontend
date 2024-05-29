@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import './Calendar.css';
 import { MONTH_NAMES, WEEKDAY_NAMES, WEEK_LENGTH, areEqual, getNextDate, getPreviousDate } from '../../common/dates';
-import { apiFetch } from '../../common/fetch';
+import { POST, apiFetch } from '../../common/fetch';
 import Booking from '../../model/Booking';
 import BookingTag from '../bookingTag/BookingTag';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftSquareFill, ArrowRightSquareFill } from 'react-bootstrap-icons';
-import WaitModal from '../waitModal/WaitModal';
+import WaitModal from '../WaitModal';
+import { BOOKING_ROUTE } from '../../router/ClientRoutes';
+import { LOGIN_STORAGE_KEY } from '../../model/Login';
+import Header from '../Header';
 
 interface CalendarProps {
     currentDate: Date;
@@ -89,14 +92,15 @@ const Calendar = (props: CalendarProps) => {
         .filter((booking) => {return !props.lessonFilter || props.lessonFilter === booking.lesson.subject})
         .map((booking) => { 
             return <BookingTag booking={booking as Booking} disabled={disabled} onClick={() => {
-            navigate('/booking', {state: {'booking': booking, 'date': date, disabled: disabled}});
+            navigate(BOOKING_ROUTE, {state: {'booking': booking, 'date': date, disabled: disabled}});
         }}/>})
     }
 
     const updateCalendar = async() => {
         setIsLoading(true);
+        const user = sessionStorage.getItem(LOGIN_STORAGE_KEY);
         const dates = generateMonthDates(props.currentDate.getFullYear(), props.currentDate.getMonth());
-        const bookings = await apiFetch('/bookings');
+        const bookings = await apiFetch('/bookings', POST, user);
         setDates(dates);
         setBookings(bookings);
         setIsLoading(false);
@@ -112,6 +116,7 @@ const Calendar = (props: CalendarProps) => {
 
     return (
         <>
+            <Header />
             {isLoading && <WaitModal />}
             {!isLoading &&
                 (
@@ -138,7 +143,7 @@ const Calendar = (props: CalendarProps) => {
                                                     <div key={rowIndex + '-' + columnIndex} className={classes} onClick={
                                                         () => { 
                                                             if(!cell.disabled){
-                                                                navigate('/booking', {state: {'date': cell.date, 'booking': false}});
+                                                                navigate(BOOKING_ROUTE, {state: {'date': cell.date, 'booking': false}});
                                                             }
                                                         }
                                                     }>
