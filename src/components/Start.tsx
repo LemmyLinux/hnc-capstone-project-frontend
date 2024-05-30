@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { POST, apiFetch } from '../common/fetch';
 import Modal, { ModalProps, modalDefaultProps } from './Modal';
 import { HOME_ROUTE } from '../router/ClientRoutes';
-import { LOGIN_STORAGE_KEY as LOGIN_STORAGE_KEY } from '../model/Login';
+import { LOGIN_STORAGE_KEY as LOGIN_STORAGE_KEY, MAIL_STORAGE_KEY } from '../model/Login';
 
 const Start = () => {
     const navigate = useNavigate();
@@ -49,8 +49,8 @@ const Start = () => {
         
         apiFetch('/login', POST, login)
         .then((response) => {
-            console.log(response);
             sessionStorage.setItem(LOGIN_STORAGE_KEY, response.message);
+            sessionStorage.setItem(MAIL_STORAGE_KEY, mail);
             navigate(HOME_ROUTE);
         })
         .catch((error) => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './Calendar.css';
-import { MONTH_NAMES, WEEKDAY_NAMES, WEEK_LENGTH, areEqual, getNextDate, getPreviousDate } from '../../common/dates';
+import { MONTH_NAMES, WEEKDAY_NAMES, WEEK_LENGTH, areEqual, areEqualTime, getNextDate, getPreviousDate } from '../../common/dates';
 import { POST, apiFetch } from '../../common/fetch';
 import Booking from '../../model/Booking';
 import BookingTag from '../bookingTag/BookingTag';
@@ -8,8 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeftSquareFill, ArrowRightSquareFill } from 'react-bootstrap-icons';
 import WaitModal from '../WaitModal';
 import { BOOKING_ROUTE } from '../../router/ClientRoutes';
-import { LOGIN_STORAGE_KEY } from '../../model/Login';
+import { LOGIN_STORAGE_KEY, MAIL_STORAGE_KEY } from '../../model/Login';
 import Header from '../Header';
+import { AVAILABLE_ENDING_HOURS, AVAILABLE_STARTING_HOURS } from '../../common/constants';
+import { AVAILABLE, CANCELLED } from '../../model/BookingStatus';
 
 interface CalendarProps {
     currentDate: Date;
@@ -65,6 +67,7 @@ const Calendar = (props: CalendarProps) => {
     const [dates, setDates] = useState<Day[][]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [adminMode, setAdminMode] = useState<boolean>(false);
 
     const getPreviousMonth = () => {
         let month = props.currentDate.getMonth() - 1;
@@ -86,21 +89,71 @@ const Calendar = (props: CalendarProps) => {
         props.setCurrentDate(new Date(year, month, 1));
     }
 
+    const getDayBookings = (date: Date) => {
+        // Se declara una variable para introducir las reservas tanto realizadas como libres.
+        const dayBookings = [];
+        // Se obtienen las reservas del día.
+        const selectedDateBookings =  bookings
+            .filter((booking) => {return areEqual(new Date(booking.start), date)});
+
+        for(let i = 0; i < AVAILABLE_STARTING_HOURS.length; i++){
+            const start = new Date(date.toDateString() + ' ' + AVAILABLE_STARTING_HOURS[i])
+            const end = new Date(date.toDateString() + ' ' + AVAILABLE_ENDING_HOURS[i])
+            // Se presupone que será necesario crear una nueva reserva disponible
+            let createNewAvailableBooking = true;
+           // Se intenta obtener reservas para la hora seleccionada
+            const selectedtHourBookings = selectedDateBookings.filter((booking) => {return areEqualTime(new Date(booking.start), start)});
+            if(selectedtHourBookings.length > 0){
+                // Si existen se introducen en el array
+                for(let i = 0; i < selectedtHourBookings.length; i++) {
+                    dayBookings.push(selectedtHourBookings[i]);
+                    // Si alguna no está cancelada no es necesario crear una nueva
+                    if(selectedtHourBookings[i].status !== CANCELLED) {
+                        createNewAvailableBooking = false;
+                    }
+                }
+            }
+
+            if(createNewAvailableBooking){
+                const availableBooking = {
+                    id: 0,
+                    date: null,
+                    start: start,
+                    end: end,
+                    status: AVAILABLE,
+                    lesson: {
+                        id: 0,
+                        subject: '',
+                        comments: ['', '', '']
+                    },
+                    userMail: sessionStorage.getItem(MAIL_STORAGE_KEY)
+                }
+                dayBookings.push(availableBooking);
+            }
+        }
+        return dayBookings;
+    }
+
     const placeBookings = (date: Date, disabled: boolean) => {
-        return bookings
-        .filter((booking) => {return areEqual(new Date(booking.start), date)})
+        const dayBookings = getDayBookings(date);
+        // Se filtran por asignatura si el filtro está activado
+        
+        return dayBookings
         .filter((booking) => {return !props.lessonFilter || props.lessonFilter === booking.lesson.subject})
+        // Se crea una etiqueta por cada reserva
         .map((booking) => { 
-            return <BookingTag booking={booking as Booking} disabled={disabled} onClick={() => {
-            navigate(BOOKING_ROUTE, {state: {'booking': booking, 'date': date, disabled: disabled}});
+            return <BookingTag booking={booking as Booking} disabled={disabled} adminMode={adminMode} onClick={() => {
+            navigate(BOOKING_ROUTE, {state: {'booking': booking, 'date': date, disabled: disabled, adminMode: adminMode}});
         }}/>})
     }
 
     const updateCalendar = async() => {
         setIsLoading(true);
-        const user = sessionStorage.getItem(LOGIN_STORAGE_KEY);
+        const userId = sessionStorage.getItem(LOGIN_STORAGE_KEY);
+        const admin = await apiFetch('/admin', POST, userId);
+        setAdminMode(admin);
         const dates = generateMonthDates(props.currentDate.getFullYear(), props.currentDate.getMonth());
-        const bookings = await apiFetch('/bookings', POST, user);
+        const bookings = await apiFetch('/bookings');
         setDates(dates);
         setBookings(bookings);
         setIsLoading(false);
@@ -140,15 +193,9 @@ const Calendar = (props: CalendarProps) => {
                                                 let classes = 'day';
                                                 if (cell.disabled) classes += ' bg-secondary';
                                                 return (
-                                                    <div key={rowIndex + '-' + columnIndex} className={classes} onClick={
-                                                        () => { 
-                                                            if(!cell.disabled){
-                                                                navigate(BOOKING_ROUTE, {state: {'date': cell.date, 'booking': false}});
-                                                            }
-                                                        }
-                                                    }>
+                                                    <div key={rowIndex + '-' + columnIndex} className={classes}>
                                                         <span className='day-label bg-info'>{cell.date.getDate()}</span>
-                                                        {bookings && placeBookings(cell.date, cell.disabled)}
+                                                        {placeBookings(cell.date, cell.disabled)}
                                                     </div>
                                                 )
                                             }

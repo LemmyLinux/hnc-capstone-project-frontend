@@ -7,6 +7,7 @@ import { apiFetch } from '../../common/fetch';
 import { EMPTY_FILTER } from '../../common/constants';
 import { useNavigate } from 'react-router-dom';
 import { LOGIN_ROUTE } from '../../router/ClientRoutes';
+import { MAIL_STORAGE_KEY } from '../../model/Login';
 
 interface SidePanelProps {
     lessonFilter: string;
@@ -22,6 +23,7 @@ const SidePanel = (props: SidePanelProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const minYear = new Date().getFullYear() - 50;
     const maxYear = new Date().getFullYear() + 50;
+    const user = sessionStorage.getItem(MAIL_STORAGE_KEY);
 
     const setMonth = (month: number) => {
         let year = props.currentDate.getFullYear();
@@ -58,6 +60,7 @@ const SidePanel = (props: SidePanelProps) => {
             <section className='side-panel bg-info text-white'>
                 <div className='container  py-5 p-4'>
                     <h2 className='text-center'>Filtros</h2>
+                    <span className='px-2 bold'>Usuario: {user}</span>
                     <div className='container my-5'>
                     <p className='text-start'>Filtrar por asignatura:</p>
                     <select className='form-select' aria-label='Default select example' 

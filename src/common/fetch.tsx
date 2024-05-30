@@ -20,7 +20,6 @@ export const apiFetch = async (endpoint: string, method: string = 'GET', body?: 
       },
       body: JSON.stringify(body)
     });
-    console.log('response', response);
     // Se invoca la conversión de la respuesta a JSON.
       const data = await response.json();
       

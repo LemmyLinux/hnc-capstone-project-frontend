@@ -1,4 +1,5 @@
-export const LOGIN_STORAGE_KEY = 'mail';
+export const LOGIN_STORAGE_KEY = 'id';
+export const MAIL_STORAGE_KEY = 'mail';
 
 type Login = {
     id: number;

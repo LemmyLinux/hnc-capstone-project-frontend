@@ -8,6 +8,7 @@ type Booking = {
     end: Date;
     status: BookingStatus;
     lesson: Lesson;
+    userMail: string;
 }
 
 export default Booking;

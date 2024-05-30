@@ -1,20 +1,21 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import { getFormatedDate, getFormmatedTime } from '../common/dates';
 import { BOOKED, CANCELLED } from '../model/BookingStatus';
-import { POST, PUT, apiFetch } from '../common/fetch';
+import { DELETE, POST, PUT, apiFetch } from '../common/fetch';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Modal, { ModalProps, modalDefaultProps } from './Modal';
 import { XSquareFill } from 'react-bootstrap-icons';
 import { HOME_ROUTE } from '../router/ClientRoutes';
 import Booking from '../model/Booking';
-import { LOGIN_STORAGE_KEY } from '../model/Login';
+import { LOGIN_STORAGE_KEY, MAIL_STORAGE_KEY } from '../model/Login';
 import Header from './Header';
 
 const BookingForm = () => {
     const navigate = useNavigate();
     const state = useLocation().state;
     const date = state.date;
-    const disabled = state.disabled;
+    const adminMode = state.adminMode;
+    const [disabled, setDisabled] = useState<boolean>(state.disabled);
     const [id, setId] = useState<number>(0);
     const [start, setStart] = useState<string>('');
     const [end, setEnd] = useState<string>('');
@@ -41,10 +42,22 @@ const BookingForm = () => {
                 setLessonComment3(booking.lesson.comments[2]);
             }
             setUserMail(booking.userMail);
+
+            if(booking.status === CANCELLED){
+                setDisabled(true);
+            }
+            if(adminMode){
+                setDisabled(false);
+            }
         }
     }, []);
 
     const createBooking = () => {
+        let mail = sessionStorage.getItem(MAIL_STORAGE_KEY);
+        if(userMail !== ''){
+            mail = userMail;
+        }
+
         const booking = {
             id: id,
             date: date.getTime(),
@@ -56,7 +69,8 @@ const BookingForm = () => {
                 subject: lessonSubject,
                 comments: [lessonComment1, lessonComment2, lessonComment3]
             },
-            studentId: sessionStorage.getItem(LOGIN_STORAGE_KEY)
+            studentId: sessionStorage.getItem(LOGIN_STORAGE_KEY),
+            userMail: mail
         };
         return booking;
     }
@@ -75,7 +89,6 @@ const BookingForm = () => {
         
         apiFetch('/booking', method, booking)
         .then((response) => {
-            console.log('response', response);
             setModalData({
                 title: 'Datos de la reserva guardados con éxito',
                 message: 'Los cambios se reflejarán en el calendario próximamente',
@@ -124,33 +137,6 @@ const BookingForm = () => {
         });
     } 
 
-    const deleteBooking = (event: any) => {
-        event.preventDefault();
-        const booking = createBooking();
-        booking.status = CANCELLED;
-        apiFetch('/booking', PUT, booking)
-        .then((response) => {
-            setModalData({
-                title: 'Reserva cancelada',
-                message: 'Los cambios se reflejarán en el calendario próximamente',
-                acceptLabel: 'Aceptar',
-                acceptAction: () => {navigate(HOME_ROUTE)},
-                closeAction: () => {setShowModal(false)}
-            });
-            setShowModal(true);
-        })
-        .catch((error) => {
-            setModalData({
-                title: 'Error',
-                message: 'Ocurrió un error al cancelar la reserva: ' + error.message,
-                acceptLabel: 'Aceptar',
-                acceptAction: () => {setShowModal(false)},
-                closeAction: () => {setShowModal(false)}
-            });
-            setShowModal(true);
-        });
-    }
-
     const cancel = (event: any) => {
         event.preventDefault();
         navigate(HOME_ROUTE);
@@ -174,14 +160,14 @@ const BookingForm = () => {
                             <label htmlFor='start'>Hora inicio</label>
                             <input id='start' type='time' className='form-control' 
                                 required value={start}  
-                                onChange={(event) => {setStart(event.target.value)}} disabled={disabled}
+                                onChange={(event) => {setStart(event.target.value)}} disabled
                             />
                         </div>
                         <div className='form-group col p-2'>
                             <label htmlFor='end'>Hora fin</label>
                             <input id='end' type='time'  className='form-control' 
                                 required value={end}  
-                                onChange={(event) => {setEnd(event.target.value)}} disabled={disabled}
+                                onChange={(event) => {setEnd(event.target.value)}} disabled
                             />
                         </div>
                     </div>
@@ -198,8 +184,8 @@ const BookingForm = () => {
                             <div className='form-group col p-2'>
                                 <label htmlFor='mail'>Alumno</label>
                                 <input id='mail' type='mail' 
-                                    className='form-control' required value={lessonSubject}  
-                                    onChange={(event) => {setLessonSubject(event.target.value)}} disabled={disabled}
+                                    className='form-control' required value={userMail}  
+                                    disabled
                                 />
                             </div>
                         }
