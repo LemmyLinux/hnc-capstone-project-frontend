@@ -1,7 +1,7 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import { getFormatedDate, getFormmatedTime } from '../common/dates';
 import { BOOKED, CANCELLED } from '../model/BookingStatus';
-import { DELETE, POST, PUT, apiFetch } from '../common/fetch';
+import { POST, PUT, apiFetch } from '../common/fetch';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Modal, { ModalProps, modalDefaultProps } from './Modal';
 import { XSquareFill } from 'react-bootstrap-icons';
